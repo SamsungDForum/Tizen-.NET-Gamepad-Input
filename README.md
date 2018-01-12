@@ -1,5 +1,5 @@
 # GamepadInputSample
-GamepadInputSample is a sample application to demontrates the use of Tizen .NET Gamepad APIs.
+GamepadInputSample is a sample application to demontrate the use of Tizen .NET Gamepad APIs.
 ![MainPage](./Screenshots/nogamepadconnected.png)
 ![MainPage](./Screenshots/1gamepadconnected.png)
 ![MainPage](./Screenshots/apressed.png)
