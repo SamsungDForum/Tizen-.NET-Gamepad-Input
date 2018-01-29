@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using Tizen.NUI;
+using Tizen;
 using Tizen.NUI.BaseComponents;
 using Tizen.TV.Accessory;
 
@@ -9,7 +10,7 @@ namespace GamepadInputSample
     class Program : NUIApplication
     {
         TextLabel gamepadInfo1, gamepadInfo2;
-        Timer timer1;
+        Timer timer;
 
         GamePadState[] gamePadState, gamePadOldState;
         protected override void OnCreate()
@@ -23,12 +24,6 @@ namespace GamepadInputSample
             Window.Instance.KeyEvent += OnKeyEvent;
             Window.Instance.BackgroundColor = Color.Black;
             Window.Instance.Title = "Gamepad Test App";
-
-            gamePadState = new GamePadState[2];
-            gamePadOldState = new GamePadState[2];
-            timer1 = new Timer(20);
-            timer1.Interval = 20;
-
 
             gamepadInfo1 = new TextLabel("Gamepad 1");
             gamepadInfo1.HorizontalAlignment = HorizontalAlignment.Begin;
@@ -49,15 +44,26 @@ namespace GamepadInputSample
             gamepadInfo2.WidthResizePolicy = ResizePolicyType.FillToParent;
             Window.Instance.GetDefaultLayer().Add(gamepadInfo2);
 
-            for(int i = 0; i < 2; i++)
+            gamePadState = new GamePadState[2];
+            gamePadOldState = new GamePadState[2];
+
+            timer = new Timer(20);
+            timer.Interval = 20;
+
+            for (int i = 0; i < 2; i++)
             {
                 try
                 {
                     gamePadOldState[i] = GamePad.GetState((PlayerIndex)i);
                 }
-                catch( Exception e)
+                catch (PlatformNotSupportedException e)
                 {
-                    System.Console.WriteLine(e.Message);
+                    Log.Error("Gamepad", "Exception Thrown : " + e.Message);
+                    gamepadInfo1.HorizontalAlignment = HorizontalAlignment.Center;
+                    gamepadInfo1.VerticalAlignment = VerticalAlignment.Center;
+                    gamepadInfo1.TextColor = Color.Red;
+                    gamepadInfo1.Text = "Gamepad, exception thrown : " + e.Message;
+                    return;
                 }
 
                 switch (i)
@@ -92,7 +98,7 @@ namespace GamepadInputSample
             }
 
             //Start the loop
-            timer1.Tick += Timer_Tick;
+            timer.Tick += Timer_Tick;
             int MaxGamepads = GamePad.MaximumGamePadCount;
 
         }
@@ -104,7 +110,7 @@ namespace GamepadInputSample
             for (int i = 0; i < GamePad.MaximumGamePadCount; i++)
             {
 
-                switch(i)
+                switch (i)
                 {
                     case 0:
                         gamepadInfo = gamepadInfo1;
@@ -115,10 +121,10 @@ namespace GamepadInputSample
                 }
 
                 gamePadState[i] = GamePad.GetState((PlayerIndex)i);
-                if( gamePadOldState[i].IsConnected != gamePadState[i].IsConnected)
+                if (gamePadOldState[i].IsConnected != gamePadState[i].IsConnected)
                 {
                     gamePadOldState[i] = gamePadState[i];
-                    if( gamePadState[i].IsConnected)
+                    if (gamePadState[i].IsConnected)
                     {
                         gamepadInfo.TextColor = Color.Green;
                         gamepadInfo.Text = "Gamepad " + (i + 1).ToString() + " is connected";
@@ -131,7 +137,7 @@ namespace GamepadInputSample
                 }
                 if (gamePadState[i].IsConnected)
                 {
-                    
+
                     if (gamePadState[i].Buttons.A == ButtonState.Pressed)
                     {
                         gamepadInfo.Text = "Gamepad " + (i + 1).ToString() + " is connected\n";
